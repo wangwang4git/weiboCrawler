@@ -1,3 +1,10 @@
 # Byte-compiled / optimized / DLL files
 /test/*.py[cod]
 /weiboCrawler/*.py[cod]
+/weiboCrawler/*/*.py[cod]
+
+# temp
+/weiboCrawler/temp/*.*
+
+# log
+/weiboCrawler/log/*.*
