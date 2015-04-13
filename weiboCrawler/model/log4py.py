@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Date    : 2015-04-09 20:08:45
-# @Author  : VictorWwang (wangwang4whu@126.com)
-# @Link    : https://github.com/wangwang4git
-# @Version : v0.2
-
 
 import logging
 import os

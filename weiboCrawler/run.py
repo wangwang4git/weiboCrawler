@@ -8,17 +8,24 @@ from model import syscontext
 from sina.loginsinaweibo import LoginSinaWeibo
 
 def run():
+    loginValid = False
+
+    # 模拟登录
     username = syscontext.user.get('un', 'wwang1969@126')
     password = syscontext.user.get('pw', 'w196988')
-
     file_path = syscontext.config.get('temp', './temp')
-    sina = LoginSinaWeibo(soft_path = file_path)
+    httpproxy = syscontext.config.get('httpproxy', 'http://web-proxy.oa.com:8080')
+    sina = LoginSinaWeibo(soft_path = file_path, proxy = httpproxy)
     if sina.check_cookie(username, password, file_path):
-        loginValid = 'sina weibo login sucess!'
-        logInfo(loginValid)
+        loginValid = True
+        logInfo('sina weibo login sucess!')
     else:
-        loginValid = 'sina weibo login failure, check username/password!'
-        logInfo(loginValid)
+        loginValid = False
+        logInfo('sina weibo login failure, check username/password!')
+
+    if loginValid:
+        logInfo('sucess!')
+
 
 
 if __name__ == '__main__':

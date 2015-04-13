@@ -35,20 +35,24 @@ class LoginSinaWeibo():
         '''
         构造函数
         '''
-        self.cj = cookielib.LWPCookieJar()
-        self.cookie_support = urllib2.HTTPCookieProcessor(self.cj)
-        self.opener = urllib2.build_opener(self.cookie_support, urllib2.HTTPHandler)
-        urllib2.install_opener(self.opener)
-
         self.soft_path = kwargs.get('soft_path', '')
         self.cookiefile = os.path.join(self.soft_path, 'cookie.dat')
-        self.proxyip = kwargs.get('proxyip', '')
+        self.proxy = kwargs.get('proxy', '')
+        if self.proxy.startswith('http://'):
+            self.proxy = self.proxy.replace('http://', '')
         self.pcid = ''
         self.servertime = ''
         self.nonce = ''
         self.pubkey = ''
         self.rsakv = ''
 
+        self.cj = cookielib.LWPCookieJar()
+        self.cookie_support = urllib2.HTTPCookieProcessor(self.cj)
+        if self.proxy == '':
+            self.opener = urllib2.build_opener(self.cookie_support, urllib2.HTTPHandler)
+        else:
+            self.opener = urllib2.build_opener(self.cookie_support, urllib2.HTTPHandler, urllib2.ProxyHandler({'http': self.proxy}))
+        urllib2.install_opener(self.opener)
 
     def __get_millitime(self):
         '''
@@ -446,15 +450,7 @@ class LoginSinaWeibo():
             headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
             data = urllib.urlencode(data)
 
-        req = urllib2.Request(url = url, data = data, headers = headers)
-
-        proxyip = self.proxyip
-        if proxyip and '127.0.0.1' not in proxyip:
-            if proxyip.startswith('http'):
-                proxyip = proxyip.replace('http://', '')
-            req.set_proxy(proxyip, 'http')
-
-        return req
+        return urllib2.Request(url = url, data = data, headers = headers)
 
 
     def gzip_data(self, spider_data):
