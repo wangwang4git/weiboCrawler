@@ -51,7 +51,7 @@ class LoginSinaWeibo():
         if self.proxy == '':
             self.opener = urllib2.build_opener(self.cookie_support, urllib2.HTTPHandler)
         else:
-            self.opener = urllib2.build_opener(self.cookie_support, urllib2.HTTPHandler, urllib2.ProxyHandler({'http': self.proxy}))
+            pass
         urllib2.install_opener(self.opener)
 
     def __get_millitime(self):
@@ -91,7 +91,8 @@ class LoginSinaWeibo():
                 self.pcid = str(data['pcid'])
 
                 break
-            except:
+            except Exception, e:
+                logError(e)
                 msg = 'get severtime error!'
                 logError(msg)
 
@@ -166,12 +167,13 @@ class LoginSinaWeibo():
         try:
             try:
                 # 步骤一，获取加密用servertime、nonce等信息
-                stObj = self.get_servertime(login_un)
+                stObj = self.get_servertime()
                 self.servertime = stObj.get('servertime')
                 self.nonce = stObj.get('nonce')
                 self.pubkey = stObj.get('pubkey')
                 self.rsakv = stObj.get('rsakv')
-            except:
+            except Exception, e:
+                logError(e)
                 return False
 
             self.get_global_id()
@@ -198,13 +200,15 @@ class LoginSinaWeibo():
                 if 'retcode=4049' in login_url:
                     logError('nead input verify code, return failure.')
                     return False
-            except:
+            except  Exception, e:
+                logError(e)
                 s = sys.exc_info()
                 msg = ('do login %s happened on line %d' % (s[1], s[2].tb_lineno))
                 logError(msg)
 
                 loginFalg = False
-        except Exception:
+        except Exception, e:
+            logError(e)
             s = sys.exc_info()
             msg = ('login: %s happened on line %d' % (s[1], s[2].tb_lineno))
             logError(msg)
@@ -272,7 +276,8 @@ class LoginSinaWeibo():
                 text = result.read()
 
             return text
-        except:
+        except Exception, e:
+            logError(e)
             s = sys.exc_info()
             msg = ('do_login: %s happened on line %d' % (s[1], s[2].tb_lineno))
             logError(msg)
@@ -298,7 +303,8 @@ class LoginSinaWeibo():
             logInfo(msg)
 
             loginFalg = True
-        except:
+        except Exception, e:
+            logError(e)
             s = sys.exc_info()
             msg = ('redo_login %s happened on line %d' % (s[1], s[2].tb_lineno))
             logError(msg)
@@ -323,6 +329,8 @@ class LoginSinaWeibo():
 
                 loginFalg = self.login(un, pw)
         else:
+            msg = 'cookie dat not exist.'
+            logInfo(msg)
             loginFalg = self.login(un, pw)
 
         if loginFalg:
@@ -364,7 +372,8 @@ class LoginSinaWeibo():
                     html = self.gzipData(result.read())
                 else:
                     html = result.read()
-            except:
+            except Exception, e:
+                logError(e)
                 msg = 'relogin failure.'
                 logError(msg)
 
@@ -378,13 +387,13 @@ class LoginSinaWeibo():
             self.clear_cookiedat(self.cookiefile)
             return False
         elif '您的帐号存在异常' in html and '解除限制' in html:
-            msg = '账号被限制.'
+            msg = u'账号被限制.'
             logError(msg)
 
             self.clear_cookiedat(self.cookiefile)
             return False
         elif "$CONFIG['islogin'] = '0'" in html:
-            msg = '登录失败.'
+            msg = u'登录失败.'
             logError(msg)
 
             self.clear_cookiedat(self.cookiefile)
@@ -396,7 +405,7 @@ class LoginSinaWeibo():
             self.cj.save(self.cookiefile, True, True)
             return True
         else:
-            msg = '登录失败.'
+            msg = u'登录失败.'
             logError(msg)
 
             self.clear_cookiedat(self.cookiefile)
@@ -425,8 +434,10 @@ class LoginSinaWeibo():
             else:
                 content = response.read()
         except urllib2.HTTPError, e:
+            logError(e)
             return e.code
-        except:
+        except Exception, e:
+            logError(e)
             s=sys.exc_info()
             msg = 'get_content Error %s happened on line %d' % (s[1], s[2].tb_lineno)
             logError(msg)
@@ -438,8 +449,8 @@ class LoginSinaWeibo():
     def clear_cookiedat(self, datpath):
         try:
             os.remove(datpath)
-        except:
-            pass
+        except Exception, e:
+            logError(e)
 
 
     def pack_request(self, url = '', headers = {}, data = None):
