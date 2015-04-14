@@ -5,6 +5,8 @@
 
 # temp
 /weiboCrawler/temp/*.*
+/weiboCrawler/test.py
+/weiboCrawler/result.html
 
 # log
 /weiboCrawler/log/*.*

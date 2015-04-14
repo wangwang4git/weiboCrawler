@@ -51,7 +51,7 @@ class LoginSinaWeibo():
         if self.proxy == '':
             self.opener = urllib2.build_opener(self.cookie_support, urllib2.HTTPHandler)
         else:
-            pass
+            self.opener = urllib2.build_opener(self.cookie_support, urllib2.ProxyHandler({'http': self.proxy}))
         urllib2.install_opener(self.opener)
 
     def __get_millitime(self):
@@ -418,10 +418,14 @@ class LoginSinaWeibo():
         '''
         content = ''
         try:
+            # 关键的一步，加载模拟登录获取的cookie
             if os.path.exists(self.cookiefile):
                 self.cj.revert(self.cookiefile, True, True)
                 self.cookie_support = urllib2.HTTPCookieProcessor(self.cj)
-                self.opener = urllib2.build_opener(self.cookie_support, urllib2.HTTPHandler)
+                if self.proxy == '':
+                    self.opener = urllib2.build_opener(self.cookie_support, urllib2.HTTPHandler)
+                else:
+                    self.opener = urllib2.build_opener(self.cookie_support, urllib2.ProxyHandler({'http': self.proxy}))
                 urllib2.install_opener(self.opener)
             else:
                 return ''
