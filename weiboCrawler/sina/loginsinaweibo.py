@@ -270,7 +270,7 @@ class LoginSinaWeibo():
             req = self.pack_request(url, headers, postdata)
             result = urllib2.urlopen(req)
 
-            if result.info().get("Content-Encoding") == 'gzip':
+            if result.info().get('Content-Encoding') == 'gzip':
                 text = self.gzip_data(result.read())
             else:
                 text = result.read()

@@ -19,8 +19,8 @@ def run():
     file_path = syscontext.config.get('temp', './temp')
     httpproxy = syscontext.config.get('httpproxy', 'http://web-proxy.oa.com:8080')
     # 公司网络，必须走代理
-    sina = LoginSinaWeibo(soft_path = file_path, proxy = httpproxy)
-    # sina = LoginSinaWeibo(soft_path = file_path)
+    # sina = LoginSinaWeibo(soft_path = file_path, proxy = httpproxy)
+    sina = LoginSinaWeibo(soft_path = file_path)
     if sina.check_cookie(username, password, file_path):
         loginValid = True
         logInfo('sina weibo login sucess!')
