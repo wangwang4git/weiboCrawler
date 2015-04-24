@@ -7,11 +7,14 @@
 import sys
 import threading
 import re
+import json
+from bs4 import BeautifulSoup
 
 from model.log4py import logInfo
 from model.log4py import logWarn
 from model.log4py import logError
 from model import syscontext
+from weibocontent import WeiboBean
 
 '''
 线程id代表当前线程处理的是搜索结果的第几页
@@ -26,8 +29,12 @@ class SearchWeiboThread(threading.Thread):
         self.endTime = end
         self.sina = sina
         self.key = syscontext.searchKey
+        self.weibolist = []
 
     def run(self):
+        reload(sys)
+        sys.setdefaultencoding('utf-8')
+
         try:
             searchResult = ''
             url = 'http://s.weibo.com/weibo/%s&xsort=time&scope=ori&timescope=custom:%s:%s&page=%d' \
@@ -62,31 +69,43 @@ class SearchWeiboThread(threading.Thread):
 
     def fetch(self, content):
         '''
-        1. 提取json数据， 关键词 <script>.*?STK.pageletM.view\(.*?\).*?</script> ；
+        1. 提取json数据， 关键词 <script>STK && STK\.pageletM && STK\.pageletM\.view\((.*)\).*?</script> ；
         2. 提取weibo列表，关键词 <div mid=\\"\d*\\" action-type=\\"feed_list_item\\"> ；
-        2. 
+        3.
         '''
-        pattern = re.compile(r'<script>.*?STK.pageletM.view\(.*?\).*?</script>')
+        pattern = re.compile(r'<script>STK && STK\.pageletM && STK\.pageletM\.view\((.*)\).*?</script>')
         result = pattern.findall(content)
         if result:
             # 遍历，提取json数据
             for i in range(len(result)):
-                # if '<div class=\\"search_feed\\">' in result[i]:
                 strContent = result[i]
-                # 剔除Emoji
-                # strContent = re.sub(u'[\ud83c\udc00-\ud83c\udfff]|[\ud83d\udc00-\ud83d\udfff]|[\u2600-\u27ff]', '', strContent)
-                # strContent = strContent.replace(r"\ /", "")
-                # strContent = strContent.replace(r"\n", "")
-                # strContent = strContent.replace(r"\t", "")
-                # strContent = strContent.replace(r"\/", "/")
-                # strContent = strContent.replace(r'\"', "'")
-                strContent = strContent.decode('unicode_escape').replace('\\', '')
-                print strContent
-                # strContent = strContent.replace("&lt;", "<").replace("&gt;", ">").replace("&nbsp;", "")
+                # 剔除Emoji，留个坑，后续解决！！
+                pass
+
                 if '"pl_weibo_direct"' in strContent:
-                    print strContent
-                    # f = open('result2', 'w')
-                    # print >> f, result[i]
+                    decodejson = json.loads(strContent)
+                    htmlDoc = decodejson['html']
+
+                    result2 = open('result2.html', 'w')
+                    print >> result2, htmlDoc
+
+                    soup = BeautifulSoup(htmlDoc)
+                    li = soup.find_all('div', {'action-type': 'feed_list_item'})
+                    for i in range(len(li)):
+                        soupi = li[i]
+                        weibo = WeiboBean()
+
+                        weibo.mid = soupi['mid']
+
+                        soupii = soupi.find('div', {'class': 'feed_content wbcon'})
+                        weibo.name = soupii.a['nick-name'].decode('gbk')
+                        weibo.userurl = soupii.a['href']
+                        weibo.content = soupii.p.get_text()
+
+                        print weibo
+                        break
+
+                    break
 
 
 if __name__ == '__main__':
