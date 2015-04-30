@@ -4,7 +4,7 @@
 from peewee import *
 import datetime
 
-weiboDB = SqliteDatabase('weibodata.db', threadlocals=True)
+weiboDB = SqliteDatabase('weibodata.db', threadlocals = True)
 
 class BaseModel(Model):
     class Meta:
@@ -12,7 +12,7 @@ class BaseModel(Model):
 
 class Weibo(BaseModel):
     mid = CharField(unique = True)
-    date = DateTimeField(default = datetime.datetime.now)
+    date = DateTimeField(default = datetime.date.today)
     name = TextField()
     userurl = TextField()
     content = TextField()
