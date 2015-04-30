@@ -11,10 +11,10 @@ class WeiboBean():
         self.weibourl = ''
 
     def __repr__(self):
-        return '[ ' + self.mid + '|' + self.name + '|' + self.userurl + ' ]'
+        return '[ ' + self.mid + '|' + self.name + '|' + self.userurl + '|' + self.content + '|' + self.weibourl + ' ]'
 
     def __str__(self):
-        return '[ ' + self.mid + '|' + self.name + '|' + self.userurl + ' ]'
+        return '[ ' + self.mid + '|' + self.name + '|' + self.userurl + '|' + self.content + '|' + self.weibourl + ' ]'
 
 if __name__ == '__main__':
     print WeiboBean()
