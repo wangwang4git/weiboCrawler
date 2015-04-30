@@ -18,6 +18,7 @@ from model.log4py import logWarn
 from model.log4py import logError
 from model import syscontext
 from weibocontent import WeiboBean
+from model.weiboORM import *
 import weibomid
 
 '''
@@ -122,13 +123,14 @@ class SearchWeiboThread(threading.Thread):
                         weibo.weibourl = weibo.userurl + '/' + weibomid.midToStr(weibo.mid)
                         weibo.weibourl = weibo.weibourl.replace('/u', '')
 
-                        # print weibo
+                        # logInfo(weibo)
                         self.weibolist.append(weibo)
 
                     break
 
-            # print 'weibolist size = ' + str(len(self.weibolist))
-            self.analyze()
+            logInfo('weibolist size = ' + str(len(self.weibolist)))
+            # self.analyze()
+            self.saveToDB()
 
 
 
@@ -139,14 +141,27 @@ class SearchWeiboThread(threading.Thread):
         # print到终端用
         # reload(sys)
         # sys.setdefaultencoding('gb18030')
-        
+
         if self.weibolist:
             for i in range(len(self.weibolist)):
                 weibo = self.weibolist[i]
                 if u'手机QQ浏览器' not in weibo.content:
                     seg_list = jieba.cut(weibo.content)
-                    print('|' .join(seg_list))
+                    logInfo('|' .join(seg_list))
 
+    def saveToDB(self):
+        '''
+        结果写入SQLite3
+        '''
+        weiboDB.connect()
+        weiboDB.create_tables([Weibo], safe = True)
+        if self.weibolist:
+            for i in range(len(self.weibolist)):
+                weiboData = self.weibolist[i]
+                Weibo.create(mid = weiboData.mid, name = weiboData.name, userurl = weiboData.userurl, \
+                    content = weiboData.content, weibourl = weiboData.weibourl)
+
+        logInfo('save over~')
 
 
 if __name__ == '__main__':

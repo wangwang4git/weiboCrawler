@@ -5,9 +5,12 @@
 
 # temp
 /weiboCrawler/temp/*.*
-/weiboCrawler/test.py
-/weiboCrawler/result.html
-/weiboCrawler/result2.html
+/weiboCrawler/test.*
+/weiboCrawler/*.html
+/weiboCrawler/*.html
 
 # log
 /weiboCrawler/log/*.*
+
+# db
+/weiboCrawler/*.db
